@@ -6,9 +6,9 @@ const app = express();
 //     res.send("Hello from / !!!");
 // });
 
-app.get(/.*fly/,(req, res) => {
-    res.send("Executed");
-});
+// app.get(/.*fly/,(req, res) => {
+//     res.send("Executed");
+// });
 
 // app.get('/user/:id/:name',(req, res) => {
 //     console.log("Path param", req.params);
@@ -20,9 +20,18 @@ app.get(/.*fly/,(req, res) => {
 //     res.send({name: "Vinay111", age: 24});
 // });
 
-app.post('/user', (req, res) => {
-    console.log("POst request received");
-    res.send({message: "Data saved successfully"});
+app.get('/user', [(req, res, next) => {
+    next();
+},
+(req, res, next) => {
+    next();
+}],
+(req, res, next) => {
+    res.send("Response 3");
+    next();
+},
+(req, res, next) => {
+    next();
 });
 
 
@@ -30,11 +39,6 @@ app.delete('/user',(req, res) => {
     res.send("User deleted successfully");
 });
 
-
-
-// app.use((req, res) => {
-//     res.send("Hello from the server!!!");
-// });
 
 app.listen(7777, () => {
     console.log('Server is running on port 7777');
