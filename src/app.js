@@ -1,4 +1,5 @@
 const express = require('express');
+const { adminAuth, userAuth } = require('./middlewares/auth');
 
 const app = express();
 
@@ -20,20 +21,27 @@ const app = express();
 //     res.send({name: "Vinay111", age: 24});
 // });
 
-app.get('/user', [(req, res, next) => {
-    next();
-},
-(req, res, next) => {
-    next();
-}],
-(req, res, next) => {
-    res.send("Response 3");
-    next();
-},
-(req, res, next) => {
+app.use('/admin', adminAuth);
+
+app.get('/admin/getAllData', (req, res, next) => {
+    res.send("Getting all admin data");
+});
+
+app.get('/admin/deleteAllData', (req, res, next) => {
+
+        res.send("Delete all admin data");
+
+});
+ 
+app.get('/user', userAuth, (req, res, next) => {
+    console.log("First handler");
     next();
 });
 
+app.get('/user', (req, res, next) => {
+    console.log("First handler");
+    res.send("Request habdler 2 got executed")
+});
 
 app.delete('/user',(req, res) => {
     res.send("User deleted successfully");
