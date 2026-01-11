@@ -1,43 +1,47 @@
 const express = require('express');
 const { userAuth } = require('../middlewares/auth');
 const ConnectionRequest = require('../models/connectionRequest');
+const {User} = require('../models/user.js');
 
 const userRouter = express.Router();
 
-userRouter.get('/user/requests/recieved', userAuth, (req, res) => {
+userRouter.get('/user/requests/recieved', userAuth, async (req, res) => {
     try {
         const toUserId = req.user._id;
-        const connectionRequests = ConnectionRequest.find({
+        console.log("ToUserId ::", toUserId);
+        const connectionRequests = await ConnectionRequest.find({
             toUserId,
             status: 'interested'
         }).populate('fromUserId', ["firstName", "lastName", "age", "photoUrl", "about"]);
-
+       
         res.json({message: `Data fetched successfully`,
             data: connectionRequests
         });
     } catch(err) {
+        console.log(err);
         res.status(500).send("Something went wrong")
     }
 });
 
-userRouter.get('/user/connections', userAuth, (req, res) => {
+userRouter.get('/user/connections', userAuth, async (req, res) => {
     try {
         const loggedInUser = req.user;
-        const connections = ConnectionRequest.find({
+        const connections = await ConnectionRequest.find({
             $or: [
-                {formUserId: loggedInUser._id, status: 'accepted'},
+                {fromUserId: loggedInUser._id, status: 'accepted'},
                 {toUserId: loggedInUser._id, status: 'accepted'},
             ]
         })
         .populate('fromUserId', "firstName lastName age photoUrl about")
         .populate('toUserId', "firstName lastName age photoUrl about")
 
+        console.log("Connections ::", connections)
         const data = connections.map(connection => {
-            if (connection.formUserId._id.toString() === loggedInUser._id.toString()) {
+            if (connection.fromUserId._id.toString() === loggedInUser._id.toString()) {
                 return connection.toUserId;
             }
 
-            return connection.formUserId;
+            return connection.fromUserId;
         })
 
         res.json(data);
@@ -58,14 +62,14 @@ userRouter.get("/feed", userAuth, async (req, res) => {
 
         const connectionRequests = await ConnectionRequest.find({
             $or: [
-                {formUserId: loggedInUser._id},
+                {fromUserId: loggedInUser._id},
                 {toUserId: loggedInUser._id}
             ]
         }).select("fromUserId toUserId");
         
         const hideUserFromFeed = new Set();
         connectionRequests.forEach(row => {
-            hideUserFromFeed.add(row.formUserId);
+            hideUserFromFeed.add(row.fromUserId);
             hideUserFromFeed.add(row.toUserId);
         });
 
@@ -74,13 +78,15 @@ userRouter.get("/feed", userAuth, async (req, res) => {
                 {_id: {$nin: Array.from(hideUserFromFeed)}},
                 {_id : {$ne: loggedInUser._id}}
             ]
-        }).select("firstName lastName age skills about")
+        }).select("firstName lastName age photoUrl gender skills about")
         .skip(skip)
         .limit(limit)
 
-        res.json({data: feed});
+        console.log(feed);
+        res.json(feed);
 
     } catch(err) {
+        console.log(err);
         res.status(400).send("Something went wrong" + err.message);
     }
 });

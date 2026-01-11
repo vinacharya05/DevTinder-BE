@@ -1,6 +1,7 @@
 const express = require('express');
 const {userAuth} = require('../middlewares/auth');
-const { Connection } = require('mongoose');
+const Connection = require('../models/connectionRequest');
+const { User } = require('../models/user');
 
 const requestRouter = express.Router();
 
@@ -12,7 +13,7 @@ requestRouter.post('/request/send/:status/:toUserId', userAuth, async (req, res)
        const status = req.params.status;
 
        const ALLOWED_STATUS = ["ignored", "interested"];
-       if (ALLOWED_STATUS.includes(status)) {
+       if (!ALLOWED_STATUS.includes(status)) {
         throw new Error("Not a valid status " + status);
        }
 

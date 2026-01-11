@@ -1,7 +1,7 @@
 const {Schema, model} = require('mongoose');
 
 const connectionRequestSchema = new Schema({
-    formUserId: {
+    fromUserId: {
         type: Schema.Types.ObjectId,
         ref: "User",
         required: true
@@ -18,14 +18,12 @@ const connectionRequestSchema = new Schema({
     }}
 }, {timestamps: true});
 
-connectionRequestSchema.index({formUserId: 1, toUserId: 1});
+connectionRequestSchema.index({fromUserId: 1, toUserId: 1});
 
 connectionRequestSchema.pre('save', function() {
-    if (this.formUserId.equals(this.toUserId)) {
+    if (this.fromUserId.equals(this.toUserId)) {
         throw new Error("Cannot send request to yourself");
     }
-
-    next();
-})
+});
 
 module.exports = model('CoonectionRequest', connectionRequestSchema);

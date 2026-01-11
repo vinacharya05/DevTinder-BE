@@ -7,18 +7,20 @@ const bcrypt = require('bcrypt');
 const authRouter = express.Router();
 
 authRouter.post('/signup', async(req, res) => {
-    const {firstName, lastName, emailId, password } = req.body;
+    const {firstName, lastName, emailId, password, gender } = req.body;
 
     try {
         //Validate the request body
         validateSignUpForm(req);
         //Encrypt the password
         const passwordHash = await bcrypt.hash(password, 10);
-        const user = new User({firstName, lastName, emailId, password: passwordHash});
-        await user.save();
-        res.send("User is uccessfully created");
+        const user = new User({firstName, lastName, emailId, password: passwordHash, gender});
+        const savedUser = await user.save();
+        const token = await savedUser.getJWT();
+        res.cookie('token', token, {expires: new Date(Date.now() + 8 * 360000)});
+        res.json({message: 'User signup succesful', data: savedUser});
     } catch(err) {
-        res.status(500).send(`Something went wrong ${err.message}`);
+        res.status(500).send(`Error: ${err.message}`);
     }
 });
 
@@ -37,15 +39,14 @@ authRouter.post('/login', async (req, res) => {
        const isValidPassword = await user.isPasswordValid(password);
        if (isValidPassword) {
         const token = await user.getJWT();
-        console.log("Token created")
-        res.cookie('token', token, {expires: new Date(Date.now() + 900000)});
-        res.send("Login is successful");
+        res.cookie('token', token, {expires: new Date(Date.now() + 8 * 360000)});
+        res.json({message: 'Login succesful', data: user});
        } else {
         throw new Error("Invalid credentials");
        }
 
     } catch(err) {
-        res.status(500).send(`Something went wrong ${err.message}`);
+        res.status(500).send(`Error: ${err.message}`);
     }
 });
 
