@@ -11,11 +11,13 @@ const connectionRequestSchema = new Schema({
         ref: "User",
         required: true
     },
-    status: {type: String,
-    enum: {
-      values: ['interested', 'ignored', 'accepted', 'rejected'],
-      message: '{VALUE} is not a supported status'
-    }}
+    status: {
+        type: String,
+        enum: {
+            values: ['interested', 'ignored', 'accepted', 'rejected'],
+            message: '{VALUE} is not a supported status'
+        }
+    }
 }, {timestamps: true});
 
 connectionRequestSchema.index({fromUserId: 1, toUserId: 1});

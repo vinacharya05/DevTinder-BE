@@ -19,7 +19,6 @@ const userAuth = async (req, res, next) => {
         next();
 
     } catch(err) {
-        console.log("Eroror:: ", err.message);
         res.status(401).send('Unauthorized access');
     }
     

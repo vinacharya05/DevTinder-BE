@@ -16,7 +16,6 @@ const validateSignUpForm = (req) => {
 
 const validateProfileUpdateData = (req) => {
     const ALLOWED_FOR_UPDATE = ["gender", "age", "about","firstName", "lastName", "skills", "photoUrl"];
-    console.log(Object.keys(req.body));
     return Object.keys(req.body).every(k => ALLOWED_FOR_UPDATE.includes(k));
 }
 

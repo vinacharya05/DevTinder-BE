@@ -8,7 +8,6 @@ const userRouter = express.Router();
 userRouter.get('/user/requests/recieved', userAuth, async (req, res) => {
     try {
         const toUserId = req.user._id;
-        console.log("ToUserId ::", toUserId);
         const connectionRequests = await ConnectionRequest.find({
             toUserId,
             status: 'interested'
@@ -18,7 +17,6 @@ userRouter.get('/user/requests/recieved', userAuth, async (req, res) => {
             data: connectionRequests
         });
     } catch(err) {
-        console.log(err);
         res.status(500).send("Something went wrong")
     }
 });
@@ -35,7 +33,6 @@ userRouter.get('/user/connections', userAuth, async (req, res) => {
         .populate('fromUserId', "firstName lastName age photoUrl about")
         .populate('toUserId', "firstName lastName age photoUrl about")
 
-        console.log("Connections ::", connections)
         const data = connections.map(connection => {
             if (connection.fromUserId._id.toString() === loggedInUser._id.toString()) {
                 return connection.toUserId;
@@ -82,11 +79,9 @@ userRouter.get("/feed", userAuth, async (req, res) => {
         .skip(skip)
         .limit(limit)
 
-        console.log(feed);
         res.json(feed);
 
     } catch(err) {
-        console.log(err);
         res.status(400).send("Something went wrong" + err.message);
     }
 });
