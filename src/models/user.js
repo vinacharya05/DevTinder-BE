@@ -33,7 +33,7 @@ const userSchema = new Schema({
 }, {timestamps: true});
 
 userSchema.methods.getJWT = async function() {
-    const token =  await jwt.sign({_id: this._id}, "Dev@Tinder$", {expiresIn: '7d'});
+    const token =  await jwt.sign({_id: this._id}, process.env.JWT_SECRET, {expiresIn: '7d'});
     return token;
 }
 

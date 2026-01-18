@@ -12,6 +12,8 @@ const http = require('http');
 const socket = require('socket.io');
 const initializeSocket = require('./utils/socket');
 
+require('dotenv').config();
+
 const app = express();
 
 app.use(cors({
@@ -42,7 +44,7 @@ app.get('/feed', async(req, res) => {
 
 connectDB().then(() => {
     console.log("Database connection successfully established ...");
-    server.listen(7777, () => {
+    server.listen(process.env.PORT, () => {
         console.log('Server is running on port 7777');
     });
 }).catch(() => console.log("Database connection not established ..."));

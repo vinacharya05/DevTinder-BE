@@ -2,6 +2,7 @@ const express = require('express');
 const {userAuth} = require('../middlewares/auth');
 const Connection = require('../models/connectionRequest');
 const { User } = require('../models/user');
+const sendEmail = require("../utils/sendEmail")
 
 const requestRouter = express.Router();
 
@@ -36,6 +37,9 @@ requestRouter.post('/request/send/:status/:toUserId', userAuth, async (req, res)
        const connection = new Connection({fromUserId, toUserId, status});
 
        const saveResponse = await connection.save();
+       // Trigger an email
+       const emailResponse = await sendEmail.run();
+       console.log(emailResponse);
 
        const message = status === 'interested' ? `${loggedInUser.firstName} interested in ${toUser.firstName}` : `${loggedInUser.firstName} rejected ${toUser.firstName}` 
 
