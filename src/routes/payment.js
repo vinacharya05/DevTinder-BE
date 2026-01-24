@@ -51,12 +51,14 @@ paymentRouter.post("/payment/webhook", async(req, res) => {
              res.status(400).send({message: "Webhook signature is invalid"});
         }
 
+        console.log("Webhook valid")
+
         const paymentDetails = req.body.payload.payment.entity;
 
         const payment = await Payment.findOne({orderId: paymentDetails.order_id});
         payment.status = paymentDetails.status;
         await payment.save();
-
+        console.log("req body", req.body);
         if (req.body.event === 'payment.captured') {
             const user = await User.findOne({_id: payment.userId});
             user.isPremium = true;
@@ -70,6 +72,7 @@ paymentRouter.post("/payment/webhook", async(req, res) => {
 
         return req.status(200).send({msg: "Webhook recieved successfully"});
     } catch(err) {
+        console.log(err.message)
         res.status(500).send({message: err.message})
     }
 });
