@@ -13,6 +13,9 @@ const socket = require('socket.io');
 const initializeSocket = require('./utils/socket');
 
 require('dotenv').config();
+const paymentRouter = require('./routes/payment');
+
+require('./utils/cronjob')
 
 const app = express();
 
@@ -28,19 +31,20 @@ app.use('/', profileRouter);
 app.use('/', requestRouter);
 app.use('/', userRouter);
 app.use('/', chatRouter);
+app.use('/', paymentRouter);
 
 const server = http.createServer(app);
 initializeSocket(server);
 
 
-app.get('/feed', async(req, res) => {
-    try {
-        const users = await User.find({});
-        res.send(users);
-    } catch(err) {
-        res.status(500).send("something went wrong");
-    }
-});
+// app.get('/feed', async(req, res) => {
+//     try {
+//         const users = await User.find({});
+//         res.send(users);
+//     } catch(err) {
+//         res.status(500).send("something went wrong");
+//     }
+// });
 
 connectDB().then(() => {
     console.log("Database connection successfully established ...");

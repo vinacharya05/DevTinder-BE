@@ -29,7 +29,14 @@ const userSchema = new Schema({
         if (!validator.isURL(value)) {
             throw new Error("Not a valid image url");
         }
-    }}
+    }},
+    isPremium: {
+        type: Boolean,
+        default: false
+    },
+    membershipType: {
+        type: String
+    }
 }, {timestamps: true});
 
 userSchema.methods.getJWT = async function() {
